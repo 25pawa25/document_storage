@@ -55,16 +55,16 @@ jobs:
     needs: lint
 
     env:
-      DATA_PATH: ${{ secrets.DATA_PATH }}
-      PLATFORM: ${{ secrets.PLATFORM }}
-      CLICKHOUSE_USER: ${{ secrets.CLICKHOUSE_USER }}
-      CLICKHOUSE_PASSWORD: ${{ secrets.CLICKHOUSE_PASSWORD }}
-      CLICKHOUSE_DATABASE: ${{ secrets.CLICKHOUSE_DATABASE }}
-      MONGODB_USER: ${{ secrets.MONGODB_USER }}
-      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-      MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
-      GRAFANA_ADMIN_NAME: ${{ secrets.GRAFANA_ADMIN_NAME }}
-      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+      DATA_PATH: ${{ vars.DATA_PATH }}
+      PLATFORM: ${{ vars.PLATFORM }}
+      CLICKHOUSE_USER: ${{ vars.CLICKHOUSE_USER }}
+      CLICKHOUSE_PASSWORD: ${{ vars.CLICKHOUSE_PASSWORD }}
+      CLICKHOUSE_DATABASE: ${{ vars.CLICKHOUSE_DATABASE }}
+      MONGODB_USER: ${{ vars.MONGODB_USER }}
+      MONGODB_PASSWORD: ${{ vars.MONGODB_PASSWORD }}
+      MONGODB_DATABASE: ${{ vars.MONGODB_DATABASE }}
+      GRAFANA_ADMIN_NAME: ${{ vars.GRAFANA_ADMIN_NAME }}
+      GRAFANA_ADMIN_PASSWORD: ${{ vars.GRAFANA_ADMIN_PASSWORD }}
 
     steps:
     - name: Check out variables
