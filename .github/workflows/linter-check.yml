@@ -55,16 +55,16 @@ jobs:
     needs: lint
 
     env:
-      DATA_PATH: ${{ variabels.DATA_PATH }}
-      PLATFORM: ${{ variabels.PLATFORM }}
-      CLICKHOUSE_USER: ${{ variabels.CLICKHOUSE_USER }}
-      CLICKHOUSE_PASSWORD: ${{ variabels.CLICKHOUSE_PASSWORD }}
-      CLICKHOUSE_DATABASE: ${{ variabels.CLICKHOUSE_DATABASE }}
-      MONGODB_USER: ${{ variabels.MONGODB_USER }}
-      MONGODB_PASSWORD: ${{ variabels.MONGODB_PASSWORD }}
-      MONGODB_DATABASE: ${{ variabels.MONGODB_DATABASE }}
-      GRAFANA_ADMIN_NAME: ${{ variabels.GRAFANA_ADMIN_NAME }}
-      GRAFANA_ADMIN_PASSWORD: ${{ variabels.GRAFANA_ADMIN_PASSWORD }}
+      DATA_PATH: ${{ env.DATA_PATH }}
+      PLATFORM: ${{ env.PLATFORM }}
+      CLICKHOUSE_USER: ${{ env.CLICKHOUSE_USER }}
+      CLICKHOUSE_PASSWORD: ${{ env.CLICKHOUSE_PASSWORD }}
+      CLICKHOUSE_DATABASE: ${{ env.CLICKHOUSE_DATABASE }}
+      MONGODB_USER: ${{ env.MONGODB_USER }}
+      MONGODB_PASSWORD: ${{ env.MONGODB_PASSWORD }}
+      MONGODB_DATABASE: ${{ env.MONGODB_DATABASE }}
+      GRAFANA_ADMIN_NAME: ${{ env.GRAFANA_ADMIN_NAME }}
+      GRAFANA_ADMIN_PASSWORD: ${{ env.GRAFANA_ADMIN_PASSWORD }}
 
     steps:
     - name: Check out code
