@@ -81,6 +81,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y docker-compose
 
+    - name: Create Docker network
+      run: |
+        docker network create storage_default || echo "Network already exists"
+
     - name: Build and start services
       run: |
         docker-compose -f docker-compose.yml build
