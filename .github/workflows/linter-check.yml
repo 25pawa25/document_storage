@@ -71,7 +71,6 @@ jobs:
       uses: dotenv-actions/setup-dotenv@v2
       with:
         dotenv_path: .env
-      run: echo "Host -> $PLATFORM"
 
     - name: Check out code
       uses: actions/checkout@v3
