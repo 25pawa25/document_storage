@@ -10,9 +10,9 @@ x-def-logging: &default-logging
     options:
       loki-url: "http://localhost:3100/loki/api/v1/push"
       loki-batch-size: "100"
-      loki-retries: 2
-      loki-max-backoff: 1000ms
-      loki-timeout: 1s
+      loki-retries: "2"
+      loki-max-backoff: "1000ms"
+      loki-timeout: "1s"
 
 services:
   document_storage_api:
