@@ -67,6 +67,12 @@ jobs:
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
 
     steps:
+    - name: Check out variables
+      run: |
+        echo "DATA_PATH: $DATA_PATH"
+        echo "CLICKHOUSE_USER: $CLICKHOUSE_USER"
+        echo "MONGODB_USER: $MONGODB_USER"
+        echo "GRAFANA_ADMIN_NAME: $GRAFANA_ADMIN_NAME"
     - name: Check out code
       uses: actions/checkout@v3
 
