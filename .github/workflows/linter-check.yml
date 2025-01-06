@@ -22,6 +22,17 @@ jobs:
       with:
         python-version: '3.9'
 
+    - name: Verify configuration files
+      run: |
+        if [ ! -f ".flake8" ]; then
+          echo ".flake8 file is missing"
+          exit 1
+        fi
+        if [ ! -f "pyproject.toml" ]; then
+          echo "pyproject.toml file is missing"
+          exit 1
+        fi
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
