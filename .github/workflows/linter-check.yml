@@ -49,3 +49,49 @@ jobs:
     - name: Run black
       run: |
         black --config=pyproject.toml src/
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+
+#    env:
+#      DATA_PATH: ${{ variabels.DATA_PATH }}
+#      PLATFORM: ${{ PLATFORM }}
+#      CLICKHOUSE_USER: ${{ CLICKHOUSE_USER }}
+#      CLICKHOUSE_PASSWORD: ${{ CLICKHOUSE_PASSWORD }}
+#      CLICKHOUSE_DATABASE: ${{ CLICKHOUSE_DATABASE }}
+#      MONGODB_USER: ${{ MONGODB_USER }}
+#      MONGODB_PASSWORD: ${{ MONGODB_PASSWORD }}
+#      MONGODB_DATABASE: ${{ MONGODB_DATABASE }}
+#      GRAFANA_ADMIN_NAME: ${{ GRAFANA_ADMIN_NAME }}
+#      GRAFANA_ADMIN_PASSWORD: ${{ GRAFANA_ADMIN_PASSWORD }}
+
+    steps:
+    - name: Load environment variables
+      uses: dotenv-actions/setup-dotenv@v2
+      with:
+        dotenv_path: .env
+      run: echo "Host -> $PLATFORM"
+
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Build and start services
+      run: |
+        docker-compose -f docker-compose.yml build
+        docker-compose -f docker-compose.yml up -d
+
+    - name: Wait for services to be healthy
+      run: |
+        sleep 30
+        docker-compose -f docker-compose.yml ps
+
+    - name: Tear down services
+      if: always()
+      run: |
+        docker-compose -f docker-compose.yml down
