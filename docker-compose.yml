@@ -1,0 +1,136 @@
+version: '3.7'
+
+networks:
+  storage_default:
+    external: true
+
+x-def-logging: &default-logging
+  logging:
+    driver: "loki"
+    options:
+      loki-url: "http://localhost:3100/loki/api/v1/push"
+      loki-batch-size: "100"
+      loki-retries: 2
+      loki-max-backoff: 1000ms
+      loki-timeout: 1s
+
+services:
+  document_storage_api:
+    networks:
+      - storage_default
+    container_name: document_storage
+    platform: ${PLATFORM}
+    <<: *default-logging
+    build:
+      context: .
+      dockerfile: docker/document_storage/Dockerfile
+      target: server
+    depends_on:
+      - clickhouse
+      - mongodb
+      - grafana
+      - loki
+      - nginx
+    ports:
+      - "8001:8000"
+
+  clickhouse:
+    image: yandex/clickhouse-server
+    restart: always
+    container_name: clickhouse
+    <<: *default-logging
+    networks:
+      - storage_default
+    environment:
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - CLICKHOUSE_DB=${CLICKHOUSE_DATABASE}
+    volumes:
+      - ${DATA_PATH}/clickhouse:/var/lib/clickhouse
+      - ./logs:/var/log/clickhouse-server
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8123/ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+
+  mongodb:
+    image: mongo
+    restart: always
+    <<: *default-logging
+    networks:
+      - storage_default
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    volumes:
+      - ${DATA_PATH}/mongo:/data/db
+    healthcheck:
+      test: [ "CMD","mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    ports:
+      - "27017:27017"
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    networks:
+      - storage_default
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    networks:
+      - storage_default
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_NAME}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  loki:
+    hostname: loki
+    image: grafana/loki:2.9.0
+    environment:
+      TZ: ${SYSTEM_TIMEZONE:-Europe/Moscow}
+    networks:
+      - storage_default
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/retention-config.yaml
+    command: -config.file=/etc/loki/retention-config.yaml
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    <<: *default-logging
+    networks:
+      - storage_default
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
