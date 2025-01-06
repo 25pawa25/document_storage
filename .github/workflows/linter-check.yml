@@ -54,24 +54,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
 
-#    env:
-#      DATA_PATH: ${{ variabels.DATA_PATH }}
-#      PLATFORM: ${{ PLATFORM }}
-#      CLICKHOUSE_USER: ${{ CLICKHOUSE_USER }}
-#      CLICKHOUSE_PASSWORD: ${{ CLICKHOUSE_PASSWORD }}
-#      CLICKHOUSE_DATABASE: ${{ CLICKHOUSE_DATABASE }}
-#      MONGODB_USER: ${{ MONGODB_USER }}
-#      MONGODB_PASSWORD: ${{ MONGODB_PASSWORD }}
-#      MONGODB_DATABASE: ${{ MONGODB_DATABASE }}
-#      GRAFANA_ADMIN_NAME: ${{ GRAFANA_ADMIN_NAME }}
-#      GRAFANA_ADMIN_PASSWORD: ${{ GRAFANA_ADMIN_PASSWORD }}
+    env:
+      DATA_PATH: ${{ variabels.DATA_PATH }}
+      PLATFORM: ${{ variabels.PLATFORM }}
+      CLICKHOUSE_USER: ${{ variabels.CLICKHOUSE_USER }}
+      CLICKHOUSE_PASSWORD: ${{ variabels.CLICKHOUSE_PASSWORD }}
+      CLICKHOUSE_DATABASE: ${{ variabels.CLICKHOUSE_DATABASE }}
+      MONGODB_USER: ${{ variabels.MONGODB_USER }}
+      MONGODB_PASSWORD: ${{ variabels.MONGODB_PASSWORD }}
+      MONGODB_DATABASE: ${{ variabels.MONGODB_DATABASE }}
+      GRAFANA_ADMIN_NAME: ${{ variabels.GRAFANA_ADMIN_NAME }}
+      GRAFANA_ADMIN_PASSWORD: ${{ variabels.GRAFANA_ADMIN_PASSWORD }}
 
     steps:
-    - name: Load environment variables
-      uses: dotenv-actions/setup-dotenv@v2
-      with:
-        dotenv_path: .env
-
     - name: Check out code
       uses: actions/checkout@v3
 
