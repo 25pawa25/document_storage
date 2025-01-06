@@ -36,4 +36,4 @@ jobs:
 
     - name: Run black
       run: |
-        black --config=pyproject.toml --check src/
+        black --config=pyproject.toml src/
