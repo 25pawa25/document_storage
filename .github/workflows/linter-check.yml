@@ -81,9 +81,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y docker-compose
 
-    - name: Create Docker network
+    - name: Prepare Docker
       run: |
         docker network create storage_default || echo "Network already exists"
+        docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
 
     - name: Build and start services
       run: |
