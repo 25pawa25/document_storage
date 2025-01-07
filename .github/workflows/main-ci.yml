@@ -1,4 +1,4 @@
-name: Check Linters
+name: FastAPI CI/CD
 
 on:
   push:
