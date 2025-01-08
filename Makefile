@@ -10,9 +10,6 @@ down:
 status:
 	docker-compose -f docker-compose.yml ps
 
-test:
-	docker-compose -f docker-compose.yml exec -e DEBUG=True cve_extract_api sh -c "cd .. && pytest -vv -s tests/test_GRPCAsyncServer.py"
-
 # Status alias
 s: status
 
