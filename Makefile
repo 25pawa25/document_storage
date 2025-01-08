@@ -37,18 +37,5 @@ grant-permissions:
 	docker-compose -f docker-compose.yml exec -T -u root vpn-manager-postgres chown postgres:postgres /var/lib/postgresql/data
 
 check-linters:
-	@echo "Start checking isort..."
-	docker run -it --volume=./:/src --platform=linux/amd64 --rm registry.mathun.team/matrix-hunter/dev/linters/python-lints/all-lints:latest isort --settings-file=/pyproject.toml /src
-	@echo "Stop checking isort..."
+	docker-compose run --rm lint
 
-	@echo "Start checking black..."
-	docker run -it --volume=./src:/src --platform=linux/amd64 --rm registry.mathun.team/matrix-hunter/dev/linters/python-lints/all-lints:latest black --config=/pyproject.toml /src
-	@echo "Stop checking black..."
-
-	@echo "Start checking flake8..."
-	docker run -it --volume=./src:/src --platform=linux/amd64 --rm registry.mathun.team/matrix-hunter/dev/linters/python-lints/all-lints:latest flake8 --config=/.flake8 /src
-	@echo "Stop checking flake8..."
-
-proto:
-	python -m grpc_tools.protoc -I=protobuf/ --python_out=src/proto --grpc_python_out=src/proto protobuf/*.proto
-	cd src/proto && sed -i '' 's/^\(import.*pb2\)/from . \1/g' *.py
