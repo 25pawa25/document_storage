@@ -132,6 +132,12 @@ services:
       - storage_default
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    command: >
+      sh -c "
+        until curl -s http://document_storage_api:8000/healthcheck; do echo 'Waiting for document_storage_api...'; sleep 3; done;
+        echo 'Nginx started!';
+        nginx -g 'daemon off;'
+      "
     ports:
       - "80:80"
 
