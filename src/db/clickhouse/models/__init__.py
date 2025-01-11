@@ -1,1 +1,1 @@
-from db.clickhouse.models.document import Document
+from db.clickhouse.models.analytics import Analytics

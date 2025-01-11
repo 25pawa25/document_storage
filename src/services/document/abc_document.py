@@ -1,18 +1,20 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from schemas.request.document import DocumentRequest
-from schemas.response.document import DocumentResponse
 
 
 class AbstractDocumentService(ABC):
     @abstractmethod
-    async def create_document(self, document: DocumentRequest):
+    async def add_or_update_document(self, document: DocumentRequest) -> dict:
         ...
 
     @abstractmethod
-    async def get_document(self, title: str, file_type: str = None) -> DocumentResponse:
+    async def get_documents(
+        self, title: Optional[str] = None, limit: int = None
+    ) -> list:
         ...
 
     @abstractmethod
-    async def delete_document(self, title: str):
+    async def delete_document(self, title: str) -> int:
         ...

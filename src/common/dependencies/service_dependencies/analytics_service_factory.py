@@ -1,16 +1,18 @@
+from clickhouse_connect.driver import AsyncClient
 from fastapi import Depends
-from motor.motor_asyncio import AsyncIOMotorClient
 
 from common.dependencies.registrator import add_factory_to_mapper
-from db.mongodb.connection import get_async_mongodb_client
-from repository.mongo_implementation.analytics_repository import AnalyticsRepository
+from db.clickhouse.connection import get_async_clickhouse_client
+from repository.clickhouse_implementation.analytics_repository import (
+    AnalyticsRepository,
+)
 from services.analytics.abc_analytics import AbstractAnalyticsService
 from services.analytics.analytics import AnalyticsService
 
 
 @add_factory_to_mapper(AbstractAnalyticsService)
 def create_analytics_service(
-    client: AsyncIOMotorClient = Depends(get_async_mongodb_client),
+    client: AsyncClient = Depends(get_async_clickhouse_client),
 ):
     return AnalyticsService(
         analytics_repository=AnalyticsRepository(client=client),

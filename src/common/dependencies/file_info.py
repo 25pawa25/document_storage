@@ -24,7 +24,7 @@ class FileInfo:
         size = file.size
         file_format = magic.from_buffer(content, mime=True)
         return DocumentRequest(
-            title=os.path.splitext(basename)[0],
+            title=basename,
             content=content_str,
             type=os.path.splitext(basename)[1].lower(),
             file_format=file_format,
