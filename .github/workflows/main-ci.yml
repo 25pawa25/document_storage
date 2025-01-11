@@ -1,0 +1,102 @@
+name: FastAPI CI/CD
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Verify configuration files
+      run: |
+        if [ ! -f ".flake8" ]; then
+          echo ".flake8 file is missing"
+          exit 1
+        fi
+        if [ ! -f "pyproject.toml" ]; then
+          echo "pyproject.toml file is missing"
+          exit 1
+        fi
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 isort black
+
+    - name: Run flake8
+      run: |
+        flake8 --config=.flake8 src/
+
+    - name: Run isort
+      run: |
+        isort --settings-file=pyproject.toml --check-only src/
+
+    - name: Run black
+      run: |
+        black --config=pyproject.toml src/
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+
+    env:
+      DATA_PATH: ${{ vars.DATA_PATH }}
+      PLATFORM: ${{ vars.PLATFORM }}
+      CLICKHOUSE_USER: ${{ vars.CLICKHOUSE_USER }}
+      CLICKHOUSE_PASSWORD: ${{ vars.CLICKHOUSE_PASSWORD }}
+      CLICKHOUSE_DATABASE: ${{ vars.CLICKHOUSE_DATABASE }}
+      MONGODB_USER: ${{ vars.MONGODB_USER }}
+      MONGODB_PASSWORD: ${{ vars.MONGODB_PASSWORD }}
+      MONGODB_DATABASE: ${{ vars.MONGODB_DATABASE }}
+      GRAFANA_ADMIN_NAME: ${{ vars.GRAFANA_ADMIN_NAME }}
+      GRAFANA_ADMIN_PASSWORD: ${{ vars.GRAFANA_ADMIN_PASSWORD }}
+
+    steps:
+    - name: Check out variables
+      run: |
+        echo "DATA_PATH: $DATA_PATH"
+        echo "CLICKHOUSE_USER: $CLICKHOUSE_USER"
+        echo "MONGODB_USER: $MONGODB_USER"
+        echo "GRAFANA_ADMIN_NAME: $GRAFANA_ADMIN_NAME"
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+    - name: Prepare Docker
+      run: |
+        docker network create storage_default || echo "Network already exists"
+        docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+
+    - name: Build and start services
+      run: |
+        docker-compose -f docker-compose.yml build
+        docker-compose -f docker-compose.yml up -d
+
+    - name: Wait for services to be healthy
+      run: |
+        sleep 30
+        docker-compose -f docker-compose.yml ps
+
+    - name: Tear down services
+      if: always()
+      run: |
+        docker-compose -f docker-compose.yml down
